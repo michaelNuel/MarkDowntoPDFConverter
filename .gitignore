@@ -1,0 +1,14 @@
+# Compiled binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+md2pdf
+
+# Output PDFs
+*.pdf
+
+# Temp files
+*.tmp
+*.html
