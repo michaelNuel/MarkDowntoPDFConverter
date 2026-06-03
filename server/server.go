@@ -105,7 +105,7 @@ func Start(filePath string, port int, themeName string) {
 	// 2. Format the address string (e.g. "127.0.0.1:8080")
 	// addr := fmt.Sprintf("127.0.0.1:%d", port)
 	// fmt.Printf("\nWeb server running! open: http://%s\n", addr)
-		// --- CLOUD DEPLOYMENT UPDATE ---
+	// --- CLOUD DEPLOYMENT UPDATE ---
 	// Check if the cloud provider gave us a "PORT" environment variable.
 	// If it exists, we use it. If not, we fall back to our CLI port.
 	var addr string
@@ -115,8 +115,8 @@ func Start(filePath string, port int, themeName string) {
 		addr = ":" + cloudPort
 		fmt.Printf("\nRunning in production mode on port %s\n", cloudPort)
 	} else {
-		// Locally, bind to "127.0.0.1" (localhost only)
-		addr = fmt.Sprintf("127.0.0.1:%d", port)
+		// changed to 0.0.0.0
+		addr = fmt.Sprintf("0.0.0.0:%d", port)
 		fmt.Printf("\nWeb server running! Open: http://%s\n", addr)
 	}
 	//Start the Server. this blocks and keeps running in the terminal
