@@ -8,6 +8,7 @@ import (
 	"github.com/michaelNuel/markdownConverter/server"
 	"log"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -30,6 +31,10 @@ func main() {
 	case "serve":
 		//Handle Serve Command
 		runServe(os.Args[2:])
+
+	case "batch":
+		//Handle Batch Command
+		runBatch(os.Args[2:])
 
 	default:
 		fmt.Printf("Unknown command: %s\n", command)
@@ -100,4 +105,46 @@ func runServe(args []string) {
 	// CALL YOUR SERVER START FUNCTION HERE!
 	server.Start(*inputPath, *port, *theme)
 
+}
+
+func runBatch(args []string){
+	//Create a flag set specifically for the batch command 
+	cmd := flag.NewFlagSet("batch", flag.ExitOnError)
+
+	//Define the flags for this command 
+	repos := cmd.String("repos", "", "Comma-seperated list of Github repositories (required)")
+	outDir := cmd.String("outdir", "downloads", "Folder where the pdfs should be saved")
+	workers := cmd.Int("workers", 3, "Number of parrallel workers (default is 3)")
+
+	// 2. Parse the arguments
+	cmd.Parse(args)
+
+	//Validate that the user provide repos 
+	if *repos == "" {
+			log.Fatal("Error: Missing required flag -repos. Example: -repos 'username/repo1, username/repo2'")
+	}
+  
+	//Split the comma seperated string into a raw list of strings 
+	rawRepos := strings.Split(*repos, ",")
+	var cleanRepos []string 
+
+	//sanitze the inputs: remove any accidental spaces 
+	for _,  r:= range rawRepos {
+		clean := strings.TrimSpace(r)
+		if clean != "" {
+			//Append  the clean Repository path to our file 
+			cleanRepos = append(cleanRepos, clean )
+		}
+	}
+
+	//Validate we have at least one repository to process 
+	if  len(cleanRepos) == 0 {
+		log.Fatal("Error: no valid repository paths provided after cleaning. ")
+	}
+
+	//Call our RunBatchResponse function from the converter package 
+	err := converter.RunBatchQueue(cleanRepos, *outDir, *workers)
+	if err != nil {
+		log.Fatalf("Batch queue failed: %v", err)
+	}
 }
